@@ -7,7 +7,7 @@ Load [pino](https://github.com/pinojs/pino) logs into
 
 ```
 npm install pino-elasticsearch -g
-```
+``` 
 
 ## Usage
 
