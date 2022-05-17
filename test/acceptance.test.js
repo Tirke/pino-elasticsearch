@@ -3,7 +3,7 @@
 const { once } = require('events')
 const pino = require('pino')
 const IER = require('is-elasticsearch-running')
-const elastic = require('../')
+const elastic = require('../').default
 const tap = require('tap')
 const test = require('tap').test
 const { Client } = require('@elastic/elasticsearch')
