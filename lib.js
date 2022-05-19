@@ -9,7 +9,8 @@ function pinoElasticSearch(opts) {
     const splitter = (0, split2_1.default)(function (line) {
         let value;
         const setDateTimeString = (value) => {
-            if (typeof value === 'object' && value.hasOwn('time')) {
+            if (typeof value === 'object' &&
+                Object.prototype.hasOwnProperty.call(value, 'time')) {
                 if ((typeof value.time === 'string' && value.time.length) ||
                     (typeof value.time === 'number' && value.time >= 0)) {
                     return new Date(value.time).toISOString();
@@ -48,17 +49,22 @@ function pinoElasticSearch(opts) {
         node: opts.node,
         auth: opts.auth,
         cloud: opts.cloud,
+        ...(opts.Connection && { Connection: opts.Connection }),
     });
+    const esVersion = Number(opts['es-version']) || 7;
     const index = opts.index || 'pino';
-    const type = opts.esVersion >= 7 ? undefined : opts.type || 'log';
-    const opType = opts.esVersion >= 7 ? opts.op_type : undefined;
+    const type = esVersion >= 7 ? undefined : opts.type || 'log';
+    const opType = esVersion >= 7 ? opts.op_type : undefined;
     const getIndexName = (time = new Date().toISOString()) => {
+        if (typeof index === 'function') {
+            return index(time);
+        }
         return index.replace('%{DATE}', time.substring(0, 10));
     };
     const b = client.helpers.bulk({
         datasource: splitter,
-        flushBytes: opts.flushBytes || 1000,
-        flushInterval: opts.flushInterval || 30000,
+        flushBytes: opts['flush-bytes'] || 1000,
+        flushInterval: opts['flush-interval'] || 30000,
         refreshOnCompletion: getIndexName(),
         onDocument(doc) {
             const date = doc.time || doc['@timestamp'];
@@ -85,5 +91,4 @@ function pinoElasticSearch(opts) {
     };
     return splitter;
 }
-exports.default = pinoElasticSearch;
-//# sourceMappingURL=index.js.map
+module.exports =  pinoElasticSearch;
